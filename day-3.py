@@ -23,7 +23,7 @@ def read_schematic(filename):
                     print(f'Number: {number} on ({span}, {line_number})')
                 else:
                     part = match.group('part')
-                    parts[line_number][span[0]] = part
+                    parts[line_number][span[0]] = { part: [] }
                     print(f'Part: {part} on ({span}, {line_number})')
                 start_pos = match.end()
             else:
@@ -36,10 +36,12 @@ def count_number(line_number, span, parts, number, lines):
         if line in parts:
             for pos in range(span[0]-1,span[1]+2):
                 if pos in parts[line]:
-                    print(f'Found part {parts[line][pos]} @ ({pos}, {line_number}) for {number} ({span}, {line_number})')
+                    part = list(parts[line][pos].keys())[0]
+                    print(f'Found part {part} @ ({pos}, {line_number}) for {number} ({span}, {line_number})')
                     print(f'Line {line_number}: {lines[line_number]}')
                     if line_number != line:
                         print(f'Line {line}: {lines[line]}')
+                    parts[line][pos][part].append(number)
                     return True
     return False
 
@@ -48,6 +50,20 @@ total = 0
 for line_number, span, number in numbers:
     if count_number(line_number, span, parts, number, lines):
         total += number
+print(total)
+total = 0
+for line in parts:
+    for pos in parts[line]:
+        for part in parts[line][pos]:
+            if part == '*' and len(parts[line][pos][part]) == 2:
+                gear_ratio = parts[line][pos][part][0] * parts[line][pos][part][1]
+                print(f'Found gear {part} @ ({pos}, {line}) with ratio {parts[line][pos][part][0]}*{parts[line][pos][part][1]}={gear_ratio}:')
+                if line > 0:
+                    print(f'Line {line-1}: {lines[line-1]}')
+                print(f'Line {line}: {lines[line]}')
+                if line < len(lines)-1:
+                    print(f'Line {line+1}: {lines[line+1]}')
+                total += gear_ratio
 print(total)
 
 
