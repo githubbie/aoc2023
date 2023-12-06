@@ -3,12 +3,12 @@ import sys
 
 def race(time):
     distances = [t*(time-t) for t in range(time)] + [0]
-    print(f'Distances for {time}: {distances}')
+    #print(f'Distances for {time}: {distances}')
     return distances
 
 def process(filename):
     for line in open(filename):
-        line = line.strip()
+        line = line.strip().replace(' ','')
         if line.startswith('Time'):
             times = [int(s) for s in line.split(':')[-1].split()]
         else:
