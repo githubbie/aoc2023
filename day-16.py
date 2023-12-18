@@ -33,23 +33,39 @@ def dump_energized(energized):
     for line in energized:
         print(''.join([{False: '.', True: '#'}[e] for e in line]))
 
-def process_map(map):
-    beams = [(-1,0,1,0)]
+def process_map(map, initial_position):
+    beams = [initial_position]
     energized = [[False for _ in map[0]] for _ in map]
     processed = set()
     while beams != []:
-        print("Beams:", beams)
-        dump_energized(energized)
+        #print("Beams:", beams)
+        #dump_energized(energized)
         beams = process_beams(map, beams, energized, processed)
-    print("Final:")
-    dump_energized(energized)
-    print(sum([sum(e) for e in energized]))
+    #print("Final:")
+    #dump_energized(energized)
+    return sum([sum(e) for e in energized])
+
+def process_map1(map):
+    print(process_map(map, (-1,0,1,0)))
+
+def process_map2(map):
+    max_total = -1
+    for x in range(len(map[0])):
+        max_total = max(max_total,
+                        process_map(map, (x, -1, 0, 1)),
+                        process_map(map, (x, len(map)+1, 0, -1)))
+    for y in range(len(map)):
+        max_total = max(max_total,
+                        process_map(map, (-1, y, 1, 0)),
+                        process_map(map, (len(map[0]), y, -1, 0)))
+    print(max_total)
 
 def process(filename):
     map = []
     for line in open(filename):
         map.append(line.strip())
-    process_map(map)
+    process_map1(map)
+    process_map2(map)
 
 if len(sys.argv) > 1:
     process(sys.argv[1])
